@@ -430,7 +430,7 @@ static void lcd_prepare_menu()
     START_MENU();
     MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
     MENU_ITEM(gcode, MSG_DISABLE_STEPPERS, PSTR("M84"));
-    MENU_ITEM(gcode, MSG_AUTO_HOME, PSTR("G28"));
+    MENU_ITEM(gcode, MSG_AUTO_HOME, PSTR("G29"));
     //MENU_ITEM(gcode, MSG_SET_ORIGIN, PSTR("G92 X0 Y0 Z0"));
     MENU_ITEM(function, MSG_PREHEAT_ABS, lcd_preheat_abs);
     MENU_ITEM(function, MSG_PREHEAT_PLA, lcd_preheat_pla);

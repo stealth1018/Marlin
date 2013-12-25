@@ -871,7 +871,7 @@ static void run_z_probe() {
     feedrate = homing_feedrate[Z_AXIS];
 
     // move down until you find the bed
-    float zPosition = -10;
+    float zPosition = -1.5 * max_length(Z_AXIS);
     plan_buffer_line(current_position[X_AXIS], current_position[Y_AXIS], zPosition, current_position[E_AXIS], feedrate/60, active_extruder);
     st_synchronize();
 
@@ -1550,11 +1550,40 @@ void process_commands()
             free(plane_equation_coefficients);
             
 #else // ACCURATE_BED_LEVELING not defined
+
+  
+          plan_bed_level_matrix.set_to_identity();  //Reset the plane ("erase" all leveling data)
+          
+          saved_feedrate = feedrate;
+          saved_feedmultiply = feedmultiply;
+          feedmultiply = 100;
+          previous_millis_cmd = millis();
+    
+          enable_endstops(true);
+    
+          for(int8_t i=0; i < NUM_AXIS; i++) {
+            destination[i] = current_position[i];
+          }
+          feedrate = 0.0;
+    
+          home_all_axis = !((code_seen(axis_codes[0])) || (code_seen(axis_codes[1])) || (code_seen(axis_codes[2])));
+    
+          if((home_all_axis) || (code_seen(axis_codes[X_AXIS])) || (code_seen(axis_codes[Y_AXIS])))
+          {
+            do_blocking_move_relative(0, 0, Z_RAISE_BEFORE_PROBING);
             
-          if ((axis_known_position[X_AXIS]) && (axis_known_position[Y_AXIS]))
-          {            
+            HOMEAXIS(X);
+            if(code_value_long() != 0) {
+              current_position[X_AXIS]=code_value()+add_homeing[0];
+            }
+            
+            HOMEAXIS(Y);
+            if(code_value_long() != 0) {
+              current_position[Y_AXIS]=code_value()+add_homeing[1];
+            } 
+          }
+           
             // prob 1
-            do_blocking_move_to(current_position[X_AXIS], current_position[Y_AXIS], Z_RAISE_BEFORE_PROBING);
             do_blocking_move_to(LEFT_PROBE_BED_POSITION - X_PROBE_OFFSET_FROM_EXTRUDER, BACK_PROBE_BED_POSITION - Y_PROBE_OFFSET_FROM_EXTRUDER, current_position[Z_AXIS]);
             
             if(READ(Z_MIN_PIN)){
@@ -1623,15 +1652,9 @@ void process_commands()
             apply_rotation_xyz(plan_bed_level_matrix, x_tmp, y_tmp, z_tmp);         //Apply the correction sending the probe offset
             current_position[Z_AXIS] = z_tmp - real_z + current_position[Z_AXIS];   //The difference is added to current position and sent to planner.
             plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
-            retract_z_probe(); // Retract Z Servo endstop if available
+            retract_z_probe(); // Retract Z Servo endstop if available            
             clean_up_after_endstop_move();
-            
-          } else {
-          LCD_MESSAGEPGM(MSG_POSITION_UNKNOWN);
-          SERIAL_ECHO_START;
-          SERIAL_ECHOLNPGM(MSG_POSITION_UNKNOWN);
-          }
-            
+            do_blocking_move_to(79.5, current_position[Y_AXIS], current_position[Z_AXIS]);
         }
         break;
 
