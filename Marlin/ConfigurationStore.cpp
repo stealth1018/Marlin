@@ -181,9 +181,9 @@ void Config_PrintSettings()
     SERIAL_ECHOLN("");
 
     SERIAL_ECHO_START;
-    SERIAL_ECHOLNPGM("PROBE:");
+    SERIAL_ECHOLNPGM("Z PROBE OFFSET:");
     SERIAL_ECHO_START;
-    SERIAL_ECHOPAIR("  M",zprobe_offset);
+    SERIAL_ECHOPAIR("  M3 S",zprobe_offset);
     SERIAL_ECHOLN("");
 } 
 #endif

@@ -85,6 +85,7 @@
 // M Codes
 // M0   - Unconditional stop - Wait for user to press a button on the LCD (Only if ULTRA_LCD is enabled)
 // M1   - Same as M0
+// M3   - change probe offset
 // M17  - Enable/Power all stepper motors
 // M18  - Disable all stepper motors; same as M84
 // M20  - List SD card
@@ -1754,6 +1755,22 @@ void process_commands()
     }
     break;
 #endif
+
+    case 3:  // M3 - change z probe offset
+    {
+      if (code_seen('S')){
+      SERIAL_ECHO_START;
+      SERIAL_ECHOPAIR("Z probe offset before:",zprobe_offset);      
+      SERIAL_PROTOCOLPGM("\n");
+      
+      zprobe_offset=code_value(); 
+      
+      SERIAL_ECHO_START;
+      SERIAL_ECHOPAIR("Z probe offset  after:",zprobe_offset);   
+      }    
+    }
+    break;
+    
     case 17:
         LCD_MESSAGEPGM(MSG_NO_MOVE);
         enable_x();
