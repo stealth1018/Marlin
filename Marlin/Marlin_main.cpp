@@ -899,7 +899,7 @@ static void do_blocking_move_to(float x, float y, float z) {
     float oldFeedRate = feedrate;
 
     feedrate = XY_TRAVEL_SPEED;
-
+    plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
     current_position[X_AXIS] = x;
     current_position[Y_AXIS] = y;
     current_position[Z_AXIS] = z;
@@ -994,14 +994,13 @@ static void homeaxis(int axis) {
 #endif
 
     current_position[axis] = 0;
-    plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
-
-
+    plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]); 
+    
     // Engage Servo endstop if enabled
     #ifdef SERVO_ENDSTOPS
       #if defined (ENABLE_AUTO_BED_LEVELING) && (PROBE_SERVO_DEACTIVATION_DELAY > 0)
         if (axis==Z_AXIS) {
-          engage_z_probe();
+          //engage_z_probe();
         }
 	    else
       #endif
@@ -1009,6 +1008,10 @@ static void homeaxis(int axis) {
         servos[servo_endstops[axis]].write(servo_endstop_angles[axis * 2]);
       }
     #endif
+    
+    for(int8_t i=0; i < NUM_AXIS; i++) {
+    destination[i] = current_position[i];
+    }
 
     destination[axis] = 1.5 * max_length(axis) * axis_home_dir;
     feedrate = homing_feedrate[axis];
@@ -1051,7 +1054,7 @@ static void homeaxis(int axis) {
       }
     #endif
 #if defined (ENABLE_AUTO_BED_LEVELING) && (PROBE_SERVO_DEACTIVATION_DELAY > 0)
-    if (axis==Z_AXIS) retract_z_probe();
+    //if (axis==Z_AXIS) retract_z_probe();
 #endif
 
   }
@@ -1135,7 +1138,7 @@ void process_commands()
       break;
       #endif //FWRETRACT
       
-    case 27: //G28 Home all Axis one at a time
+    case 28: //G28 Home all Axis one at a time
       plan_bed_level_matrix.set_to_identity();  //Reset the plane ("erase" all leveling data)
       
       saved_feedrate = feedrate;
@@ -1154,61 +1157,57 @@ void process_commands()
 
       if((home_all_axis) || (code_seen(axis_codes[X_AXIS])) || (code_seen(axis_codes[Y_AXIS])))
       {
-        do_blocking_move_to(current_position[X_AXIS], current_position[Y_AXIS], Z_RAISE_BEFORE_PROBING);
+        do_blocking_move_relative(0, 0, Z_RAISE_BEFORE_PROBING);
+        
         HOMEAXIS(X);
-        HOMEAXIS(Y);        
-      }      
-
-      if(code_seen(axis_codes[X_AXIS]))
-      {
         if(code_value_long() != 0) {
           current_position[X_AXIS]=code_value()+add_homeing[0];
         }
-      }
-
-      if(code_seen(axis_codes[Y_AXIS])) {
+        
+        HOMEAXIS(Y);
         if(code_value_long() != 0) {
           current_position[Y_AXIS]=code_value()+add_homeing[1];
+        } 
+      }    
+
+      if(home_all_axis) {
+        if(READ(Z_MIN_PIN)){
+        engage_z_probe();   // Engage Z Servo endstop if available
+        }
+        do_blocking_move_to(round(Z_SAFE_HOMING_X_POINT - X_PROBE_OFFSET_FROM_EXTRUDER), round(Z_SAFE_HOMING_Y_POINT - Y_PROBE_OFFSET_FROM_EXTRUDER), current_position[Z_AXIS]);
+
+        HOMEAXIS(Z);
+        current_position[Z_AXIS] -= Z_PROBE_OFFSET_FROM_EXTRUDER;
+        retract_z_probe();
+      }
+                                            // Let's see if X and Y are homed and probe is inside bed area.
+      if(code_seen(axis_codes[Z_AXIS])) {
+        if ( (axis_known_position[X_AXIS]) && (axis_known_position[Y_AXIS]) \
+          && (current_position[X_AXIS]+X_PROBE_OFFSET_FROM_EXTRUDER >= X_MIN_POS) \
+          && (current_position[X_AXIS]+X_PROBE_OFFSET_FROM_EXTRUDER <= X_MAX_POS) \
+          && (current_position[Y_AXIS]+Y_PROBE_OFFSET_FROM_EXTRUDER >= Y_MIN_POS) \
+          && (current_position[Y_AXIS]+Y_PROBE_OFFSET_FROM_EXTRUDER <= Y_MAX_POS)) {
+
+          do_blocking_move_relative(0, 0, Z_RAISE_BEFORE_PROBING);
+          if(READ(Z_MIN_PIN)){
+          engage_z_probe();   // Engage Z Servo endstop if available
+          }
+
+          HOMEAXIS(Z);
+          current_position[Z_AXIS] -= Z_PROBE_OFFSET_FROM_EXTRUDER;
+          retract_z_probe();
+          
+        } else if (!((axis_known_position[X_AXIS]) && (axis_known_position[Y_AXIS]))) {
+            LCD_MESSAGEPGM(MSG_POSITION_UNKNOWN);
+            SERIAL_ECHO_START;
+            SERIAL_ECHOLNPGM(MSG_POSITION_UNKNOWN);
+        } else {
+            LCD_MESSAGEPGM(MSG_ZPROBE_OUT);
+            SERIAL_ECHO_START;
+            SERIAL_ECHOLNPGM(MSG_ZPROBE_OUT);
         }
       }
-
-
-          if(home_all_axis) {
-            if(Z_MIN_PIN){
-            engage_z_probe();   // Engage Z Servo endstop if available
-            }
-            do_blocking_move_to(round(Z_SAFE_HOMING_X_POINT - X_PROBE_OFFSET_FROM_EXTRUDER), round(Z_SAFE_HOMING_Y_POINT - Y_PROBE_OFFSET_FROM_EXTRUDER), current_position[Z_AXIS]);
-
-            HOMEAXIS(Z);
-            current_position[Z_AXIS] -= Z_PROBE_OFFSET_FROM_EXTRUDER;
-            retract_z_probe();
-          }
-                                                // Let's see if X and Y are homed and probe is inside bed area.
-          if(code_seen(axis_codes[Z_AXIS])) {
-            if ( (axis_known_position[X_AXIS]) && (axis_known_position[Y_AXIS]) \
-              && (current_position[X_AXIS]+X_PROBE_OFFSET_FROM_EXTRUDER >= X_MIN_POS) \
-              && (current_position[X_AXIS]+X_PROBE_OFFSET_FROM_EXTRUDER <= X_MAX_POS) \
-              && (current_position[Y_AXIS]+Y_PROBE_OFFSET_FROM_EXTRUDER >= Y_MIN_POS) \
-              && (current_position[Y_AXIS]+Y_PROBE_OFFSET_FROM_EXTRUDER <= Y_MAX_POS)) {
-
-              do_blocking_move_to(current_position[X_AXIS], current_position[Y_AXIS], Z_RAISE_BEFORE_PROBING);
-
-              HOMEAXIS(Z);
-              current_position[Z_AXIS] -= Z_PROBE_OFFSET_FROM_EXTRUDER;
-              retract_z_probe();
-              
-            } else if (!((axis_known_position[X_AXIS]) && (axis_known_position[Y_AXIS]))) {
-                LCD_MESSAGEPGM(MSG_POSITION_UNKNOWN);
-                SERIAL_ECHO_START;
-                SERIAL_ECHOLNPGM(MSG_POSITION_UNKNOWN);
-            } else {
-                LCD_MESSAGEPGM(MSG_ZPROBE_OUT);
-                SERIAL_ECHO_START;
-                SERIAL_ECHOLNPGM(MSG_ZPROBE_OUT);
-            }
-          }
-
-        
+       
       if(code_seen(axis_codes[Z_AXIS])) {
         if(code_value_long() != 0) {
           current_position[Z_AXIS]=code_value()+add_homeing[2];
@@ -1552,12 +1551,13 @@ void process_commands()
             
 #else // ACCURATE_BED_LEVELING not defined
             
-            
+          if ((axis_known_position[X_AXIS]) && (axis_known_position[Y_AXIS]))
+          {            
             // prob 1
             do_blocking_move_to(current_position[X_AXIS], current_position[Y_AXIS], Z_RAISE_BEFORE_PROBING);
             do_blocking_move_to(LEFT_PROBE_BED_POSITION - X_PROBE_OFFSET_FROM_EXTRUDER, BACK_PROBE_BED_POSITION - Y_PROBE_OFFSET_FROM_EXTRUDER, current_position[Z_AXIS]);
             
-            if(Z_MIN_PIN){
+            if(READ(Z_MIN_PIN)){
             engage_z_probe();   // Engage Z Servo endstop if available
             }
             run_z_probe();
@@ -1594,7 +1594,7 @@ void process_commands()
 
             run_z_probe();
             float z_at_xRight_yFront = current_position[Z_AXIS];
-            retract_z_probe(); // Retract Z Servo endstop if available
+            
 
             SERIAL_PROTOCOLPGM("Bed x: ");
             SERIAL_PROTOCOL(RIGHT_PROBE_BED_POSITION);
@@ -1623,6 +1623,15 @@ void process_commands()
             apply_rotation_xyz(plan_bed_level_matrix, x_tmp, y_tmp, z_tmp);         //Apply the correction sending the probe offset
             current_position[Z_AXIS] = z_tmp - real_z + current_position[Z_AXIS];   //The difference is added to current position and sent to planner.
             plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
+            retract_z_probe(); // Retract Z Servo endstop if available
+            clean_up_after_endstop_move();
+            
+          } else {
+          LCD_MESSAGEPGM(MSG_POSITION_UNKNOWN);
+          SERIAL_ECHO_START;
+          SERIAL_ECHOLNPGM(MSG_POSITION_UNKNOWN);
+          }
+            
         }
         break;
 
