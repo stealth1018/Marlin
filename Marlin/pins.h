@@ -1470,7 +1470,7 @@
 #define ALARM_PIN          -1
 
 #define DIGIPOTSS_PIN 24
-#define DIGIPOT_CHANNELS {0,1,2,3,4} // X Y Z E0 E1 digipot channels to stepper driver mapping
+#define DIGIPOT_CHANNELS {0,1,2,3} // X Y Z E0 E1 digipot channels to stepper driver mapping
 
 
 #ifndef SDSUPPORT
