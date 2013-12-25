@@ -254,6 +254,20 @@ static void lcd_sdcard_stop()
     autotempShutdown();
 }
 
+static void level_check()
+{    
+    enquecommand_P((PSTR("G29")));
+    enquecommand_P((PSTR("G1 Y170 F8000")));
+}
+
+static void bed_down()
+{    
+    enquecommand_P((PSTR("G91")));
+    enquecommand_P((PSTR("G1 Z10 F3000")));
+    enquecommand_P((PSTR("M84")));  
+    enquecommand_P((PSTR("G90"))); 
+}
+
 /* Menu implementation */
 static void lcd_main_menu()
 {
@@ -432,6 +446,7 @@ static void lcd_prepare_menu()
     MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
     MENU_ITEM(gcode, MSG_DISABLE_STEPPERS, PSTR("M84"));
     MENU_ITEM(gcode, "Auto level", PSTR("G29"));
+    MENU_ITEM(function, "BED DOWN", bed_down);
     //MENU_ITEM(gcode, MSG_SET_ORIGIN, PSTR("G92 X0 Y0 Z0"));
     MENU_ITEM(function, MSG_PREHEAT_ABS, lcd_preheat_abs);
     MENU_ITEM(function, MSG_PREHEAT_PLA, lcd_preheat_pla);
@@ -604,7 +619,8 @@ static void lcd_control_menu()
     START_MENU();
     MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
     MENU_ITEM(submenu, MSG_TEMPERATURE, lcd_control_temperature_menu);
-    MENU_ITEM_EDIT(float52, "Z probe offset", &zprobe_offset, 0, 5);
+    MENU_ITEM_EDIT(float52, "Z probe offset", &zprobe_offset, 2, 4);
+    MENU_ITEM(function, "LEVEL CHECK", level_check);
     //MENU_ITEM(submenu, MSG_MOTION, lcd_control_motion_menu);
 /*#ifdef DOGLCD
 //    MENU_ITEM_EDIT(int3, MSG_CONTRAST, &lcd_contrast, 0, 63);
@@ -617,7 +633,7 @@ static void lcd_control_menu()
     MENU_ITEM(function, MSG_STORE_EPROM, Config_StoreSettings);
     //MENU_ITEM(function, MSG_LOAD_EPROM, Config_RetrieveSettings);
 #endif
-    MENU_ITEM(function, MSG_RESTORE_FAILSAFE, Config_ResetDefault);
+    //MENU_ITEM(function, MSG_RESTORE_FAILSAFE, Config_ResetDefault);
     END_MENU();
 }
 

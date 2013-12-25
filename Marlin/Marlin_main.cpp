@@ -2799,7 +2799,7 @@ void process_commands()
         
         LCD_MESSAGEPGM("Unloading filament  ");
         do_blocking_extruder(-25,400);
-        do_blocking_extruder(-30,300);
+        do_blocking_extruder(-30,200);
 
         delay(100);
         LCD_MESSAGEPGM("Click to next   ");
@@ -2847,7 +2847,7 @@ void process_commands()
       float lastpos=current_position[E_AXIS];      
       LCD_MESSAGEPGM("Unloading filament  ");
       do_blocking_extruder(-25,400);
-      do_blocking_extruder(-30,300);
+      do_blocking_extruder(-30,200);
       
       current_position[E_AXIS]=lastpos;      
     }
