@@ -399,6 +399,7 @@ static void lcd_tune_menu()
     START_MENU();
     MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
     MENU_ITEM_EDIT(int3, MSG_SPEED, &feedmultiply, 10, 999);
+    MENU_ITEM_EDIT(int3, MSG_FLOW, &extrudemultiply, 10, 999);
     MENU_ITEM_EDIT(int3, MSG_NOZZLE, &target_temperature[0], 0, HEATER_0_MAXTEMP - 15);
 #if TEMP_SENSOR_1 != 0
     MENU_ITEM_EDIT(int3, MSG_NOZZLE1, &target_temperature[1], 0, HEATER_1_MAXTEMP - 15);
@@ -410,7 +411,7 @@ static void lcd_tune_menu()
     MENU_ITEM_EDIT(int3, MSG_BED, &target_temperature_bed, 0, BED_MAXTEMP - 15);
 #endif
     MENU_ITEM_EDIT(int3, MSG_FAN_SPEED, &fanSpeed, 0, 255);
-    MENU_ITEM_EDIT(int3, MSG_FLOW, &extrudemultiply, 10, 999);
+    
 
 #ifdef BABYSTEPPING
     #ifdef BABYSTEP_XY
@@ -603,6 +604,7 @@ static void lcd_control_menu()
     START_MENU();
     MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
     MENU_ITEM(submenu, MSG_TEMPERATURE, lcd_control_temperature_menu);
+    MENU_ITEM_EDIT(float52, "Z probe offset", &zprobe_offset, 0, 5);
     //MENU_ITEM(submenu, MSG_MOTION, lcd_control_motion_menu);
 /*#ifdef DOGLCD
 //    MENU_ITEM_EDIT(int3, MSG_CONTRAST, &lcd_contrast, 0, 63);

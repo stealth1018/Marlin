@@ -827,7 +827,7 @@ static void set_bed_level_equation_lsq(double *plane_equation_coefficients)
     current_position[Z_AXIS] = corrected_position.z;
 
     // but the bed at 0 so we don't go below it.
-    current_position[Z_AXIS] = -zprobe_offset;
+    current_position[Z_AXIS] = zprobe_offset;
 
     plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
 }
@@ -863,7 +863,7 @@ static void set_bed_level_equation(float z_at_xLeft_yFront, float z_at_xRight_yF
     current_position[Z_AXIS] = corrected_position.z;
 
     // but the bed at 0 so we don't go below it.
-    current_position[Z_AXIS] = -zprobe_offset;
+    current_position[Z_AXIS] = zprobe_offset;
 
     plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
 }
@@ -1190,7 +1190,7 @@ void process_commands()
         do_blocking_move_to(round(Z_SAFE_HOMING_X_POINT - X_PROBE_OFFSET_FROM_EXTRUDER), round(Z_SAFE_HOMING_Y_POINT - Y_PROBE_OFFSET_FROM_EXTRUDER), current_position[Z_AXIS]);
 
         HOMEAXIS(Z);
-        current_position[Z_AXIS] -= zprobe_offset;
+        current_position[Z_AXIS] += zprobe_offset;
         retract_z_probe();
       }
                                             // Let's see if X and Y are homed and probe is inside bed area.
@@ -1207,7 +1207,7 @@ void process_commands()
           }
 
           HOMEAXIS(Z);
-          current_position[Z_AXIS] -= zprobe_offset;
+          current_position[Z_AXIS] += zprobe_offset;
           retract_z_probe();
           
         } else if (!((axis_known_position[X_AXIS]) && (axis_known_position[Y_AXIS]))) {
@@ -1435,7 +1435,7 @@ void process_commands()
       }
       #ifdef ENABLE_AUTO_BED_LEVELING
         if((home_all_axis) || (code_seen(axis_codes[Z_AXIS]))) {
-          current_position[Z_AXIS] -= zprobe_offset;  //Add Z_Probe offset (the distance is negative)
+          current_position[Z_AXIS] += zprobe_offset;  //Add Z_Probe offset (the distance is negative)
         }
       #endif
       plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
@@ -1673,15 +1673,19 @@ void process_commands()
         break;
 
     case 30: // G30 Single Z Probe
-        {
-            engage_z_probe(); // Engage Z Servo endstop if available
+        {          
+            if ((axis_known_position[X_AXIS]) && (axis_known_position[Y_AXIS])){
+         
+            do_blocking_move_to(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS]+Z_RAISE_BEFORE_PROBING);
+            if(READ(Z_MIN_PIN)){
+            engage_z_probe();   // Engage Z Servo endstop if available
+            }
+            do_blocking_move_to(79.5, 160, Z_RAISE_BEFORE_PROBING); 
 
             st_synchronize();
             // TODO: make sure the bed_level_rotation_matrix is identity or the planner will get set incorectly
             setup_for_endstop_move();
-
-            feedrate = homing_feedrate[Z_AXIS];
-
+            
             run_z_probe();
             SERIAL_PROTOCOLPGM("Bed Position X: ");
             SERIAL_PROTOCOL(current_position[X_AXIS]);
@@ -1690,10 +1694,22 @@ void process_commands()
             SERIAL_PROTOCOLPGM(" Z: ");
             SERIAL_PROTOCOL(current_position[Z_AXIS]);
             SERIAL_PROTOCOLPGM("\n");
+            
+            
+            real_z = float(st_get_position(Z_AXIS))/axis_steps_per_unit[Z_AXIS];  //get the real Z (since the auto bed leveling is already correcting the plane)
+            z_tmp = current_position[Z_AXIS];
 
+            current_position[Z_AXIS] = z_tmp - real_z + current_position[Z_AXIS];   //The difference is added to current position and sent to planner.
+            plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
+            retract_z_probe(); // Retract Z Servo endstop if available            
             clean_up_after_endstop_move();
 
-            retract_z_probe(); // Retract Z Servo endstop if available
+            } else {
+            LCD_MESSAGEPGM(MSG_POSITION_UNKNOWN);
+            SERIAL_ECHO_START;
+            SERIAL_ECHOLNPGM(MSG_POSITION_UNKNOWN);
+            }
+            clean_up_after_endstop_move();
         }
         break;
 #endif // ENABLE_AUTO_BED_LEVELING
