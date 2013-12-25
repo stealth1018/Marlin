@@ -233,4 +233,6 @@ extern unsigned long stoptime;
 // Handling multiple extruders pins
 extern uint8_t active_extruder;
 
+extern float zprobe_offset;
+
 #endif

@@ -85,6 +85,8 @@ static bool check_endstops = true;
 volatile long count_position[NUM_AXIS] = { 0, 0, 0, 0};
 volatile signed char count_direction[NUM_AXIS] = { 1, 1, 1, 1};
 
+unsigned long digipot_motor_current[4];
+
 //===========================================================================
 //=============================functions         ============================
 //===========================================================================
@@ -1190,8 +1192,7 @@ void digitalPotWrite(int address, int value) // From Arduino DigitalPotControl e
 void digipot_init() //Initialize Digipot Motor Current
 {
   #if defined(DIGIPOTSS_PIN) && DIGIPOTSS_PIN > -1
-    const uint8_t digipot_motor_current[] = DIGIPOT_MOTOR_CURRENT;
-
+  
     SPI.begin();
     pinMode(DIGIPOTSS_PIN, OUTPUT);
     for(int i=0;i<NUM_AXIS;i++)

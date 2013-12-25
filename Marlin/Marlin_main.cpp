@@ -288,6 +288,8 @@ bool Stopped=false;
 bool CooldownNoWait = true;
 bool target_direction;
 
+float zprobe_offset;
+
 //===========================================================================
 //=============================ROUTINES=============================
 //===========================================================================
@@ -824,7 +826,7 @@ static void set_bed_level_equation_lsq(double *plane_equation_coefficients)
     current_position[Z_AXIS] = corrected_position.z;
 
     // but the bed at 0 so we don't go below it.
-    current_position[Z_AXIS] = -Z_PROBE_OFFSET_FROM_EXTRUDER;
+    current_position[Z_AXIS] = -zprobe_offset;
 
     plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
 }
@@ -860,7 +862,7 @@ static void set_bed_level_equation(float z_at_xLeft_yFront, float z_at_xRight_yF
     current_position[Z_AXIS] = corrected_position.z;
 
     // but the bed at 0 so we don't go below it.
-    current_position[Z_AXIS] = -Z_PROBE_OFFSET_FROM_EXTRUDER;
+    current_position[Z_AXIS] = -zprobe_offset;
 
     plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
 }
@@ -1187,7 +1189,7 @@ void process_commands()
         do_blocking_move_to(round(Z_SAFE_HOMING_X_POINT - X_PROBE_OFFSET_FROM_EXTRUDER), round(Z_SAFE_HOMING_Y_POINT - Y_PROBE_OFFSET_FROM_EXTRUDER), current_position[Z_AXIS]);
 
         HOMEAXIS(Z);
-        current_position[Z_AXIS] -= Z_PROBE_OFFSET_FROM_EXTRUDER;
+        current_position[Z_AXIS] -= zprobe_offset;
         retract_z_probe();
       }
                                             // Let's see if X and Y are homed and probe is inside bed area.
@@ -1204,7 +1206,7 @@ void process_commands()
           }
 
           HOMEAXIS(Z);
-          current_position[Z_AXIS] -= Z_PROBE_OFFSET_FROM_EXTRUDER;
+          current_position[Z_AXIS] -= zprobe_offset;
           retract_z_probe();
           
         } else if (!((axis_known_position[X_AXIS]) && (axis_known_position[Y_AXIS]))) {
@@ -1432,7 +1434,7 @@ void process_commands()
       }
       #ifdef ENABLE_AUTO_BED_LEVELING
         if((home_all_axis) || (code_seen(axis_codes[Z_AXIS]))) {
-          current_position[Z_AXIS] -= Z_PROBE_OFFSET_FROM_EXTRUDER;  //Add Z_Probe offset (the distance is negative)
+          current_position[Z_AXIS] -= zprobe_offset;  //Add Z_Probe offset (the distance is negative)
         }
       #endif
       plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
@@ -2870,9 +2872,14 @@ void process_commands()
     case 907: // M907 Set digital trimpot motor current using axis codes.
     {
       #if defined(DIGIPOTSS_PIN) && DIGIPOTSS_PIN > -1
-        for(int i=0;i<NUM_AXIS;i++) if(code_seen(axis_codes[i])) digipot_current(i,code_value());
-        if(code_seen('B')) digipot_current(4,code_value());
-        if(code_seen('S')) for(int i=0;i<=4;i++) digipot_current(i,code_value());
+        for(int i=0;i<NUM_AXIS;i++)
+          if(code_seen(axis_codes[i])) {
+          digipot_current(i,code_value());
+          digipot_motor_current[i]=code_value();
+          }
+        
+        //if(code_seen('B')) digipot_current(4,code_value());
+        //if(code_seen('S')) for(int i=0;i<=4;i++) digipot_current(i,code_value());
       #endif
     }
     break;
