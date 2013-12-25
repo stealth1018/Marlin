@@ -1665,6 +1665,7 @@ void process_commands()
             retract_z_probe(); // Retract Z Servo endstop if available            
             clean_up_after_endstop_move();
             do_blocking_move_to(79.5, current_position[Y_AXIS], current_position[Z_AXIS]);
+            LCD_MESSAGEPGM("Autolevel finish  ");
         }
         break;
 
