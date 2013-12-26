@@ -2786,7 +2786,12 @@ void process_commands()
     #ifdef FILAMENTCHANGEENABLE
     case 600: //Pause for filament change X[pos] Y[pos] Z[relative lift] E[initial retract] L[later retract distance for removal]
     {
-
+      if(degHotend(active_extruder)<EXTRUDE_MINTEMP)
+      {
+        SERIAL_ECHO_START;
+        SERIAL_ECHOLNPGM(MSG_ERR_COLD_EXTRUDE_STOP);
+        LCD_ALERTMESSAGEPGM("Err:cold extrusion");
+      }else{     
         float lastpos[4];
         lastpos[X_AXIS]=current_position[X_AXIS];
         lastpos[Y_AXIS]=current_position[Y_AXIS];
@@ -2827,29 +2832,44 @@ void process_commands()
         do_blocking_move_to(lastpos[X_AXIS],lastpos[Y_AXIS],current_position[Z_AXIS]);
         do_blocking_move_to(current_position[X_AXIS],current_position[Y_AXIS],lastpos[Z_AXIS]);
         current_position[E_AXIS] = lastpos[E_AXIS];
+      }
     }
     break;
     
     case 601: //load
-    {
-      do_blocking_move_to(FILAMENTCHANGE_XPOS, FILAMENTCHANGE_YPOS, current_position[Z_AXIS]+FILAMENTCHANGE_ZADD);
-      float lastpos=current_position[E_AXIS];      
-      LCD_MESSAGEPGM("Loading filament  ");
-      do_blocking_extruder(-FILAMENTCHANGE_FINALRETRACT,400);
-      
-      current_position[E_AXIS]=lastpos;      
+    {      
+      if(degHotend(active_extruder)<EXTRUDE_MINTEMP)
+      {
+        SERIAL_ECHO_START;
+        SERIAL_ECHOLNPGM(MSG_ERR_COLD_EXTRUDE_STOP);
+        LCD_ALERTMESSAGEPGM("Err:cold extrusion");
+      }else{     
+        float lastpos=current_position[E_AXIS];
+        do_blocking_move_to(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS]+FILAMENTCHANGE_ZADD);
+              
+        LCD_MESSAGEPGM("Loading filament  ");
+        do_blocking_extruder(-FILAMENTCHANGE_FINALRETRACT,400);
+        current_position[E_AXIS]=lastpos;    
+      }     
     }
     break;
     
     case 602: //unload
     {
-      do_blocking_move_to(FILAMENTCHANGE_XPOS, FILAMENTCHANGE_YPOS, current_position[Z_AXIS]+FILAMENTCHANGE_ZADD);
-      float lastpos=current_position[E_AXIS];      
-      LCD_MESSAGEPGM("Unloading filament  ");
-      do_blocking_extruder(-25,400);
-      do_blocking_extruder(-30,200);
-      
-      current_position[E_AXIS]=lastpos;      
+      if(degHotend(active_extruder)<EXTRUDE_MINTEMP)
+      {
+        SERIAL_ECHO_START;
+        SERIAL_ECHOLNPGM(MSG_ERR_COLD_EXTRUDE_STOP);
+        LCD_ALERTMESSAGEPGM("Err:cold extrusion");
+      }else{   
+        float lastpos=current_position[E_AXIS];  
+        do_blocking_move_to(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS]+FILAMENTCHANGE_ZADD);
+              
+        LCD_MESSAGEPGM("Unloading filament  ");
+        do_blocking_extruder(-25,400);
+        do_blocking_extruder(-30,200);
+        current_position[E_AXIS]=lastpos; 
+      }
     }
     break;
     
