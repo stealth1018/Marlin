@@ -1498,9 +1498,9 @@
       //from the same bit in the RAMPS Newpanel define
       //encoder rotation values
       #define encrot0 0
-      #define encrot1 2
+      #define encrot1 1
       #define encrot2 3
-      #define encrot3 1
+      #define encrot3 2
 
       #define BLEN_C 2
       #define BLEN_B 1
