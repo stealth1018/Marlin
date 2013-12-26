@@ -1674,7 +1674,7 @@ void process_commands()
 
     case 30: // G30 Single Z Probe
         {          
-            if ((axis_known_position[X_AXIS]) && (axis_known_position[Y_AXIS])){
+            /*if ((axis_known_position[X_AXIS]) && (axis_known_position[Y_AXIS])){
          
             do_blocking_move_to(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS]+Z_RAISE_BEFORE_PROBING);
             if(READ(Z_MIN_PIN)){
@@ -1709,7 +1709,7 @@ void process_commands()
             SERIAL_ECHO_START;
             SERIAL_ECHOLNPGM(MSG_POSITION_UNKNOWN);
             }
-            clean_up_after_endstop_move();
+            clean_up_after_endstop_move();*/
         }
         break;
 #endif // ENABLE_AUTO_BED_LEVELING
@@ -1737,7 +1737,7 @@ void process_commands()
       break;
     }
   }
-
+*/
   else if(code_seen('M'))
   {
     switch( (int)code_value() )
