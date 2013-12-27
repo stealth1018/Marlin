@@ -1187,7 +1187,7 @@ void process_commands()
         if(READ(Z_MIN_PIN)){
         engage_z_probe();   // Engage Z Servo endstop if available
         }
-        do_blocking_move_to(round(Z_SAFE_HOMING_X_POINT - X_PROBE_OFFSET_FROM_EXTRUDER), round(Z_SAFE_HOMING_Y_POINT - Y_PROBE_OFFSET_FROM_EXTRUDER), current_position[Z_AXIS]);
+        do_blocking_move_to(X_MAX_POS/2, Y_MAX_POS/2, current_position[Z_AXIS]);
 
         HOMEAXIS(Z);
         current_position[Z_AXIS] += zprobe_offset;
@@ -1737,7 +1737,7 @@ void process_commands()
       break;
     }
   }
-*/
+
   else if(code_seen('M'))
   {
     switch( (int)code_value() )
@@ -2800,7 +2800,7 @@ void process_commands()
         //retract by E
 
 
-        do_blocking_move_to(FILAMENTCHANGE_XPOS, 169, current_position[Z_AXIS]+FILAMENTCHANGE_ZADD);
+        do_blocking_move_to(FILAMENTCHANGE_XPOS, FILAMENTCHANGE_YPOS, current_position[Z_AXIS]+FILAMENTCHANGE_ZADD);
         
         LCD_MESSAGEPGM("Unloading filament  ");
         do_blocking_extruder(-25,400);

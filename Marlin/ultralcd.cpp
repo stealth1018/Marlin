@@ -257,7 +257,7 @@ static void lcd_sdcard_stop()
 static void level_check()
 {    
     enquecommand_P((PSTR("G29")));
-    enquecommand_P((PSTR("G1 Y170 F8000")));
+    enquecommand_P((PSTR("G1 Y0 F8000")));
 }
 
 static void bed_down()
