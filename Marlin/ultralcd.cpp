@@ -254,12 +254,6 @@ static void lcd_sdcard_stop()
     autotempShutdown();
 }
 
-static void level_check()
-{    
-    enquecommand_P((PSTR("G29")));
-    enquecommand_P((PSTR("G1 Y0 F8000")));
-}
-
 static void bed_down()
 {    
     enquecommand_P((PSTR("G91")));
@@ -620,7 +614,7 @@ static void lcd_control_menu()
     MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
     MENU_ITEM(submenu, MSG_TEMPERATURE, lcd_control_temperature_menu);
     MENU_ITEM_EDIT(float52, "Z probe offset", &zprobe_offset, 2, 4);
-    MENU_ITEM(function, "LEVEL CHECK", level_check);
+    MENU_ITEM(gcode, "Auto level", PSTR("G29"));
     //MENU_ITEM(submenu, MSG_MOTION, lcd_control_motion_menu);
 /*#ifdef DOGLCD
 //    MENU_ITEM_EDIT(int3, MSG_CONTRAST, &lcd_contrast, 0, 63);
