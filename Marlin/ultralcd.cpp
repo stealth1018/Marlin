@@ -244,24 +244,22 @@ static void lcd_sdcard_resume()
 
 static void bed_down()
 {    
-    enquecommand_P((PSTR("G91")));
-    enquecommand_P((PSTR("G1 Z10 F3000")));
-    enquecommand_P((PSTR("M84")));  
-    enquecommand_P((PSTR("G90"))); 
+    do_blocking_move_relative(0, 0, 10);
+    enquecommand_P(PSTR(SD_FINISHED_RELEASECOMMAND));  
 }
 
 static void lcd_sdcard_stop()
 {
     card.sdprinting = false;
     card.closefile();
-    quickStop();
+    quickStop();   
+    //do_blocking_move_relative(0, 0, 10);
+    //enquecommand_P((PSTR("G1 Y169 F8000")));   
     if(SD_FINISHED_STEPPERRELEASE)
     {
         enquecommand_P(PSTR(SD_FINISHED_RELEASECOMMAND));
     }
     autotempShutdown();
-    bed_down();
-    enquecommand_P((PSTR("G1 Y169 F8000")));
 }
 
 /* Menu implementation */

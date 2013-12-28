@@ -898,7 +898,7 @@ static void run_z_probe() {
     plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
 }
 
-static void do_blocking_move_to(float x, float y, float z) {
+void do_blocking_move_to(float x, float y, float z) {
     float oldFeedRate = feedrate;
 
     feedrate = XY_TRAVEL_SPEED;
@@ -922,7 +922,7 @@ static void do_blocking_extruder(float e,int feedrate) {
     feedrate = oldFeedRate;
 }
 
-static void do_blocking_move_relative(float offset_x, float offset_y, float offset_z) {
+void do_blocking_move_relative(float offset_x, float offset_y, float offset_z) {
     do_blocking_move_to(current_position[X_AXIS] + offset_x, current_position[Y_AXIS] + offset_y, current_position[Z_AXIS] + offset_z);
 }
 
