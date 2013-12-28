@@ -242,6 +242,14 @@ static void lcd_sdcard_resume()
     card.startFileprint();
 }
 
+static void bed_down()
+{    
+    enquecommand_P((PSTR("G91")));
+    enquecommand_P((PSTR("G1 Z10 F3000")));
+    enquecommand_P((PSTR("M84")));  
+    enquecommand_P((PSTR("G90"))); 
+}
+
 static void lcd_sdcard_stop()
 {
     card.sdprinting = false;
@@ -252,14 +260,8 @@ static void lcd_sdcard_stop()
         enquecommand_P(PSTR(SD_FINISHED_RELEASECOMMAND));
     }
     autotempShutdown();
-}
-
-static void bed_down()
-{    
-    enquecommand_P((PSTR("G91")));
-    enquecommand_P((PSTR("G1 Z10 F3000")));
-    enquecommand_P((PSTR("M84")));  
-    enquecommand_P((PSTR("G90"))); 
+    bed_down();
+    enquecommand_P((PSTR("G1 Y169 F8000")));
 }
 
 /* Menu implementation */
