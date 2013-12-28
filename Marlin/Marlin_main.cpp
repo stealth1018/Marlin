@@ -936,9 +936,9 @@ static void setup_for_endstop_move() {
 }
 
 static void clean_up_after_endstop_move() {
-#ifdef ENDSTOPS_ONLY_FOR_HOMING
+//#ifdef ENDSTOPS_ONLY_FOR_HOMING
     enable_endstops(false);
-#endif
+//#endif
 
     feedrate = saved_feedrate;
     feedmultiply = saved_feedmultiply;
