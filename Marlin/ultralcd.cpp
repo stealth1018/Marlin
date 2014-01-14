@@ -613,7 +613,7 @@ static void lcd_control_menu()
     START_MENU();
     MENU_ITEM(back, MSG_MAIN, lcd_main_menu);
     MENU_ITEM(submenu, MSG_TEMPERATURE, lcd_control_temperature_menu);
-    MENU_ITEM_EDIT(float52, "Z probe offset", &zprobe_offset, 2, 4);
+    MENU_ITEM_EDIT(float52, "Z probe offset", &zprobe_offset, 1.5, 4.5);
     MENU_ITEM(gcode, "Auto level", PSTR("G29"));
     //MENU_ITEM(submenu, MSG_MOTION, lcd_control_motion_menu);
 /*#ifdef DOGLCD

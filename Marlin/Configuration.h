@@ -332,7 +332,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
   // these are the offsets to the prob relative to the extruder tip (Hotend - Probe)
   #define X_PROBE_OFFSET_FROM_EXTRUDER -17.5
   #define Y_PROBE_OFFSET_FROM_EXTRUDER -10.8
-  #define DEFAULT_Z_PROBE_OFFSET_FROM_EXTRUDER 3.15
+  #define DEFAULT_Z_PROBE_OFFSET_FROM_EXTRUDER 1.5
 
   #define Z_RAISE_BEFORE_HOMING 4       // (in mm) Raise Z before homing (G28) for Probe Clearance.
                                         // Be sure you have this distance over your Z_MAX_POS in case
@@ -383,12 +383,12 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 
 //// MOVEMENT SETTINGS
 #define NUM_AXIS 4 // The axis order in all axis related arrays is X, Y, Z, E
-#define HOMING_FEEDRATE {8000, 8000, 3000, 0}  // set the homing speeds (mm/min)
+#define HOMING_FEEDRATE {8000, 8000, 1200, 0}  // set the homing speeds (mm/min)
 
 // default settings
 
 #define DEFAULT_AXIS_STEPS_PER_UNIT   {78.7402,78.7402,200.0*16/8,101.9}  // default steps per unit for Ultimaker
-#define DEFAULT_MAX_FEEDRATE          {5000, 5000, 50, 25}    // (mm/sec)
+#define DEFAULT_MAX_FEEDRATE          {5000, 5000, 20, 25}    // (mm/sec)
 #define DEFAULT_MAX_ACCELERATION      {9000,9000,100,10000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
 
 #define DEFAULT_ACCELERATION          3000    // X, Y, Z and E max acceleration in mm/s^2 for printing moves
@@ -421,7 +421,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 //#define EEPROM_CHITCHAT
 
 // Preheat Constants
-#define PLA_PREHEAT_HOTEND_TEMP 180
+#define PLA_PREHEAT_HOTEND_TEMP 195
 #define PLA_PREHEAT_HPB_TEMP 70
 #define PLA_PREHEAT_FAN_SPEED 255   // Insert Value between 0 and 255
 
