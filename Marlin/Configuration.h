@@ -172,9 +172,9 @@
 
 // If you are using a preconfigured hotend then you can use one of the value sets by uncommenting it
 // Ultimaker
-    #define  DEFAULT_Kp 20.12
-    #define  DEFAULT_Ki 2.67
-    #define  DEFAULT_Kd 37.92
+    #define  DEFAULT_Kp 15.8
+    #define  DEFAULT_Ki 0.91
+    #define  DEFAULT_Kd 68.6
 
 // Makergear
 //    #define  DEFAULT_Kp 7.0
@@ -421,7 +421,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 //#define EEPROM_CHITCHAT
 
 // Preheat Constants
-#define PLA_PREHEAT_HOTEND_TEMP 195
+#define PLA_PREHEAT_HOTEND_TEMP 180
 #define PLA_PREHEAT_HPB_TEMP 70
 #define PLA_PREHEAT_FAN_SPEED 255   // Insert Value between 0 and 255
 
