@@ -2802,8 +2802,7 @@ void process_commands()
         do_blocking_move_to(FILAMENTCHANGE_XPOS, FILAMENTCHANGE_YPOS, current_position[Z_AXIS]+FILAMENTCHANGE_ZADD);
         
         LCD_MESSAGEPGM("Unloading filament  ");
-        do_blocking_extruder(-5,200);
-        do_blocking_extruder(-40,400);
+        do_blocking_extruder(-45,200);
 
         delay(100);
         LCD_MESSAGEPGM("Click to next   ");
@@ -2815,7 +2814,7 @@ void process_commands()
           lcd_update();     
         }
         
-        do_blocking_extruder(-FILAMENTCHANGE_FINALRETRACT,400);
+        do_blocking_extruder(-FILAMENTCHANGE_FINALRETRACT,300);
         LCD_MESSAGEPGM("Loading filament  ");
         
         delay(100);
@@ -2847,7 +2846,7 @@ void process_commands()
         do_blocking_move_to(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS]+FILAMENTCHANGE_ZADD);
               
         LCD_MESSAGEPGM("Loading filament  ");
-        do_blocking_extruder(-FILAMENTCHANGE_FINALRETRACT,400);
+        do_blocking_extruder(-FILAMENTCHANGE_FINALRETRACT,300);
         current_position[E_AXIS]=lastpos;    
       }     
     }
@@ -2865,8 +2864,7 @@ void process_commands()
         do_blocking_move_to(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS]+FILAMENTCHANGE_ZADD);
               
         LCD_MESSAGEPGM("Unloading filament  ");
-        do_blocking_extruder(-5,200);
-        do_blocking_extruder(-40,400);
+        do_blocking_extruder(-45,200);
         current_position[E_AXIS]=lastpos; 
       }
     }
